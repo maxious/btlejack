@@ -391,9 +391,11 @@ class CLIAdvertisementsSniffer(AdvertisementsSniffer):
                 self.output.write_packet(ts_sec, ts_usec, 0x8E89BED6, fake_hdr+packet.data[4:])
  
         # Generate a display using the dissector or as a raw sequence of bytes
-        pkt_hex = ' '.join(['%02x' % c for c in packet.data[4:]])   
-        if self.display_raw:
-            
+        pkt_hex = ' '.join(['%02x' % c for c in packet.data[4:]])
+        quietly = True
+        if quietly:
+            print('.', end="")   
+        elif self.display_raw:            
             print('[LL Data|CRC: '+("ok" if packet.crc_ok == 0x01 else "nok")+"|RSSI:-"+str(packet.rssi)+"dBm|CH:"+str(packet.channel)+"] "+ pkt_hex)
         else:
             print("[CRC:"+("ok" if packet.crc_ok == 0x01 else "nok")+"|RSSI:-"+str(packet.rssi)+"dBm|CH:"+str(packet.channel)+"] "+str(Advertisement.from_bytes(packet.data[4:])))
