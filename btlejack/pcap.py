@@ -5,8 +5,14 @@ This module only provides a specific class able to write
 PCAP files with Bluetooth Low Energy Link Layer.
 """
 import os
+import sys
 from io import BytesIO
 from struct import pack
+# https://wiki.wireshark.org/CaptureSetup/Pipes#Way_3:_Python_on_Windows
+IS_WINDOWS = False
+if sys.platform.startswith('win'):
+    import win32pipe, win32file
+    IS_WINDOWS = True
 
 class FifoError(Exception):
     def __init__(self):
@@ -31,13 +37,30 @@ class PcapBleWriter(object):
         if fifo is None:
             self.fifo = None
         else:
-            print("opening fifo")
+
             try:
-                # check if fifo already exists
-                if not os.path.exists(fifo):
-                    os.mkfifo(fifo)
-                print('[i] Waiting for wireshark ...')
-                self.fifo = open(fifo, 'wb')
+                if IS_WINDOWS:
+                    # check if fifo already exists
+                    print("opening fifo, run: C:\Program Files\Wireshark\Wireshark.exe -k -i\\\\.\\pipe\\"+ fifo)
+                    self.fifo = win32pipe.CreateNamedPipe(
+                        r'\\.\pipe\{}'.format(fifo),
+                        win32pipe.PIPE_ACCESS_OUTBOUND,
+                        win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_WAIT,
+                        1, 65536, 65536,
+                        300,
+                        None)
+
+                    #connect to pipe
+                    print('[i] Waiting for wireshark to connect ...')
+                    win32pipe.ConnectNamedPipe(self.fifo, None)
+
+                else:
+                    # check if fifo already exists
+                    print("opening fifo, run: wireshark -k -i",os.path.abspath(fifo))
+                    if not os.path.exists(fifo):
+                        os.mkfifo(fifo)
+                    print('[i] Waiting for wireshark to connect ...')
+                    self.fifo = open(fifo, 'wb')
             except IOError as fifo_err:
                 raise FifoError()
 
@@ -49,13 +72,16 @@ class PcapBleWriter(object):
         Write data to fifo, if a fifo has been specified.
         """
         if self.fifo is not None:
-            self.fifo.write(data)
+            if IS_WINDOWS:
+                win32file.WriteFile(self.fifo, data)
+            else:
+                self.fifo.write(data)
 
     def flush_fifo(self):
         """
         Flush fifo if a fifo has been specified.
         """
-        if self.fifo is not None:
+        if self.fifo is not None and not IS_WINDOWS:
             self.fifo.flush()
 
     def write_header(self):

@@ -526,4 +526,8 @@ def main():
     except ForcedTermination as e:
         print('[i] Quitting')
     except IOError as io_error:
-        print('[!] File access/write error occured, quitting.')
+        print('[!] File access/write error occurred, quitting.')
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()

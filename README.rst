@@ -9,7 +9,9 @@ want to use an `Adafruit's Bluefruit LE sniffer <https://www.adafruit.com/produc
 Requirements
 ============
 
-You need a UNIX based system (for example a Raspberry Pi). If you use the BBC Micro:Bit, you will need one to three Micro:Bit devices (three devices recommended) and for each device one free USB port. The power consumption of a Micro:Bit is rather low, so you can use a single USB port and a passive hub for powering the three recommended units.
+A UNIX based system (for example a Raspberry Pi) is preferred but the pcap pipe/Wireshark functionality at least does work on Windows.
+
+If you use the BBC Micro:Bit, you will need one to three Micro:Bit devices (three devices recommended) and for each device one free USB port. The power consumption of a Micro:Bit is rather low, so you can use a single USB port and a passive hub for powering the three recommended units.
 
 **If you connect 3 microbits at the same time on your computer, Btlejack will be able to sniff on every advertising channel and has far more chance to capture the connection request.**
 
