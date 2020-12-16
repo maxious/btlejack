@@ -13,5 +13,5 @@ number, and also updated into btlejack's package.
 The release number allows small modifications due to a release error or update,
 such as a wrong packaging or typos.
 """
-VERSION = '1.4'
+VERSION = '2.1'
 RELEASE = '0'
